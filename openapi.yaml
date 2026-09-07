@@ -1,0 +1,121 @@
+openapi: 3.1.0
+info:
+  title: Yahoo Fantasy Football Read-Only Bridge
+  version: 1.0.0
+  description: Read league settings, drafts, rosters, matchups, and available players.
+servers:
+  - url: https://YOUR-RENDER-SERVICE.onrender.com
+paths:
+  /leagues:
+    get:
+      operationId: getMyFootballLeagues
+      summary: Get the signed-in user's Yahoo football leagues.
+      responses:
+        "200": {description: Yahoo Fantasy league data}
+  /league/{league_key}/settings:
+    get:
+      operationId: getLeagueSettings
+      summary: Get roster and scoring settings before giving advice.
+      parameters:
+        - $ref: "#/components/parameters/LeagueKey"
+      responses:
+        "200": {description: League settings}
+  /league/{league_key}/standings:
+    get:
+      operationId: getLeagueStandings
+      summary: Get league standings.
+      parameters:
+        - $ref: "#/components/parameters/LeagueKey"
+      responses:
+        "200": {description: League standings}
+  /league/{league_key}/teams:
+    get:
+      operationId: getLeagueTeams
+      summary: Get all teams in a league and identify the user's team.
+      parameters:
+        - $ref: "#/components/parameters/LeagueKey"
+      responses:
+        "200": {description: League teams}
+  /league/{league_key}/draft:
+    get:
+      operationId: getLeagueDraftResults
+      summary: Get completed draft picks and use them for next-pick advice.
+      parameters:
+        - $ref: "#/components/parameters/LeagueKey"
+      responses:
+        "200": {description: Draft results}
+  /league/{league_key}/scoreboard:
+    get:
+      operationId: getLeagueScoreboard
+      summary: Get league matchups for a week.
+      parameters:
+        - $ref: "#/components/parameters/LeagueKey"
+        - name: week
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 25}
+      responses:
+        "200": {description: League scoreboard}
+  /league/{league_key}/players:
+    get:
+      operationId: getAvailablePlayers
+      summary: Get available, free-agent, or waiver players.
+      parameters:
+        - $ref: "#/components/parameters/LeagueKey"
+        - name: position
+          in: query
+          required: false
+          schema: {type: string, example: RB}
+        - name: status
+          in: query
+          required: false
+          schema: {type: string, enum: [A, FA, W], default: A}
+        - name: sort
+          in: query
+          required: false
+          schema: {type: string, enum: [AR, PTS, OR, PR], default: AR}
+        - name: start
+          in: query
+          required: false
+          schema: {type: integer, minimum: 0, maximum: 1000, default: 0}
+        - name: count
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 25, default: 25}
+      responses:
+        "200": {description: Player collection}
+  /team/{team_key}/roster:
+    get:
+      operationId: getTeamRoster
+      summary: Get a fantasy team's roster.
+      parameters:
+        - $ref: "#/components/parameters/TeamKey"
+        - name: week
+          in: query
+          required: false
+          schema: {type: integer, minimum: 1, maximum: 25}
+      responses:
+        "200": {description: Team roster}
+  /team/{team_key}/matchups:
+    get:
+      operationId: getTeamMatchups
+      summary: Get a fantasy team's season matchups.
+      parameters:
+        - $ref: "#/components/parameters/TeamKey"
+      responses:
+        "200": {description: Team matchups}
+components:
+  parameters:
+    LeagueKey:
+      name: league_key
+      in: path
+      required: true
+      description: Yahoo league key such as 461.l.12345.
+      schema: {type: string}
+    TeamKey:
+      name: team_key
+      in: path
+      required: true
+      description: Yahoo team key such as 461.l.12345.t.1.
+      schema: {type: string}
+
